@@ -22,7 +22,26 @@ module.exports = function (file, opts) {
   if (extensions.indexOf(path.extname(file)) === -1) {
     return PassThrough()
   }
-  var processor = opts.processor || createProcessor(opts)
+  var processor = opts.processor || postcss(
+    [].concat(opts.plugin).filter(Boolean).map(function (plugin) {
+      var opt
+      if (Array.isArray(plugin)) {
+        opt = plugin[1]
+        plugin = plugin[0]
+      }
+      if (typeof plugin === 'string') {
+        plugin = require(
+          resolve.sync(plugin, {
+            basedir: file,
+          })
+        )
+      }
+      if (typeof plugin === 'function') {
+        return plugin(opt)
+      }
+      return plugin
+    })
+  )
   var postCssOptions = opts.postCssOptions
   if (typeof postCssOptions === 'function') {
     postCssOptions = postCssOptions(file)
@@ -35,8 +54,8 @@ module.exports = function (file, opts) {
   if (parser) {
     if (typeof parser === 'string') {
       parser = require(
-        resolve.sync(String(parser), {
-          basedir: opts.basedir || process.cwd(),
+        resolve.sync(parser, {
+          basedir: file,
         })
       )
     }
@@ -46,6 +65,7 @@ module.exports = function (file, opts) {
   return sink.str(function (body, done) {
     var self = this
     var exports
+
     processor.process(body, postCssOptions)
       .then(function (result) {
         if (!opts.modularize) {
@@ -55,6 +75,10 @@ module.exports = function (file, opts) {
         return getModuleName(file)
           .then(function (modulename) {
             return moduleify(result.css, modulename, true)
+          })
+          .then(function (res) {
+            exports = JSON.stringify(res.exportTokens)
+            return res.injectableSource
           })
       })
       .then(function (result) {
@@ -81,10 +105,6 @@ function base64 (css) {
 function moduleify (css, modulename) {
   return new Core()
     .load(css, modulename)
-    .then(function (result) {
-      exports = JSON.stringify(result.exportTokens)
-      return result.injectableSource
-    })
 }
 
 function insert (css, inject) {
@@ -99,27 +119,4 @@ function insert (css, inject) {
     exp = JSON.stringify(css)
   }
   return exp
-}
-
-function createProcessor (opts) {
-  return postcss(
-    [].concat(opts.plugin).filter(Boolean).map(function (p) {
-      var opt
-      if (Array.isArray(p)) {
-        opt = p[1]
-        p = p[0]
-      }
-      if (typeof p === 'string') {
-        p = require(
-          resolve.sync(String(p), {
-            basedir: opts.basedir || process.cwd(),
-          })
-        )
-      }
-      if (typeof p === 'function') {
-        return p(opt)
-      }
-      return p
-    })
-  )
 }
