@@ -1,6 +1,6 @@
 {
   "name": "@stackstorm/browserify-postcss",
-  "version": "0.3.3",
+  "version": "0.3.4-patch.1",
   "description": "transform contents using postcss",
   "main": "index.js",
   "scripts": {
