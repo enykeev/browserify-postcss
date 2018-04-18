@@ -77,7 +77,18 @@ module.exports = function (file, opts) {
             return moduleify(result.css, modulename, true)
           })
           .then(function (res) {
-            exports = JSON.stringify(res.exportTokens)
+            if (opts.modularize && opts.modularize.camelCase) {
+              exports = {}
+              Object.keys(res.exportTokens).forEach(function (token) {
+                var newToken = token.replace(/-([a-z])/g, function (g) {
+                  return g[1].toUpperCase()
+                })
+
+                exports[newToken] = res.exportTokens[token]
+              })
+            } else {
+              exports = res.exportTokens
+            }
             return res.injectableSource
           })
       })
@@ -86,7 +97,7 @@ module.exports = function (file, opts) {
       })
       .then(function (result) {
         if (opts.modularize) {
-          self.push('module.exports = ' + exports + ';' + result)
+          self.push('module.exports = ' + JSON.stringify(exports) + ';' + result)
         } else {
           self.push('module.exports = ' + result)
         }
