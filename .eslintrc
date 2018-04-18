@@ -8,7 +8,6 @@ env:
   es6: true
 
 rules:
-  comma-dangle: [2, "always-multiline"]
   no-dupe-args: 2
   no-dupe-keys: 2
   no-duplicate-case: 2

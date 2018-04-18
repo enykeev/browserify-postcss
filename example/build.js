@@ -17,12 +17,12 @@ b.transform(require('..'), {
       ['copy', {
         assetOutFolder: __dirname + '/static/assets',
         baseUrl: 'assets',
-        name: '[name].[hash]',
-      }],
-    ]],
+        name: '[name].[hash]'
+      }]
+    ]]
   ],
   basedir: __dirname + '/src',
-  inject: true,
+  inject: true
 })
 b.require('../index.js', { expose: 'browserify-postcss' })
 b.bundle().pipe(

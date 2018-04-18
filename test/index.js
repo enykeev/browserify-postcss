@@ -10,7 +10,7 @@ function runTest (dir, opts, runOpts) {
   var b = browserify(path.join(__dirname, 'fixtures', dir, 'index.js'))
   opts = opts || {
     inject: true,
-    plugin: ['postcss-import', 'postcss-advanced-variables', 'postcss-nested'],
+    plugin: ['postcss-import', 'postcss-advanced-variables', 'postcss-nested']
   }
   b.transform(path.resolve(__dirname, '..', 'index.js'), opts)
   b.require(path.resolve(__dirname, '..', 'index.js'), { expose: 'browserify-postcss' })

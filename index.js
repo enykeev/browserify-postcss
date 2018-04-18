@@ -1,17 +1,17 @@
 var sink = require('sink-transform')
 var PassThrough = require('stream').PassThrough
-var resolve = require('resolve')
+var resolver = require('resolve')
 var postcss = require('postcss')
 var path = require('path')
 var Core = require('css-modules-loader-core')
 
-function getModuleName(file) {
-  return new Promise(function (resolves, rejects) {
-    resolve(file, {}, function (err, res, pkg) {
+function getModuleName (file) {
+  return new Promise(function (resolve, reject) {
+    resolver(file, {}, function (err, res, pkg) {
       if (err) {
-        return rejects(err)
+        return reject(err)
       }
-      return resolves(pkg.name)
+      return resolve(pkg.name)
     })
   })
 }
@@ -31,8 +31,8 @@ module.exports = function (file, opts) {
       }
       if (typeof plugin === 'string') {
         plugin = require(
-          resolve.sync(plugin, {
-            basedir: file,
+          resolver.sync(plugin, {
+            basedir: file
           })
         )
       }
@@ -54,8 +54,8 @@ module.exports = function (file, opts) {
   if (parser) {
     if (typeof parser === 'string') {
       parser = require(
-        resolve.sync(parser, {
-          basedir: file,
+        resolver.sync(parser, {
+          basedir: file
         })
       )
     }
@@ -109,7 +109,7 @@ module.exports = function (file, opts) {
 }
 
 function base64 (css) {
-  css = new Buffer(css).toString('base64')
+  css = Buffer.from(css).toString('base64')
   return 'data:text/css;base64,' + css
 }
 
