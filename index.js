@@ -18,7 +18,7 @@ function getModuleName (file) {
 
 module.exports = function (file, opts) {
   opts = opts || {}
-  var extensions = ['.css', '.scss', '.sass'].concat(opts.extensions).filter(Boolean)
+  var extensions = opts.extensions ? [].concat(opts.extensions).filter(Boolean) : ['.css', '.scss', '.sass']
   if (extensions.indexOf(path.extname(file)) === -1) {
     return PassThrough()
   }
