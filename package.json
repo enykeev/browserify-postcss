@@ -24,7 +24,7 @@
   "dependencies": {
     "css-modules-loader-core": "1.1.0",
     "cssify": "^1.0.2",
-    "postcss": "^5.0.0",
+    "postcss": "^6.0.12",
     "resolve": "^1.1.6",
     "sink-transform": "^2.0.0"
   },
